@@ -122,6 +122,12 @@ app-top-bar h1 {
   margin: 0;
 }
 
+#user_header {
+  color: white;
+  font-weight: bolder;
+  margin-right: 3%;
+}
+
 /* Checkout Cart, Shipping Prices */
 
 .cart-item, .shipping-item {

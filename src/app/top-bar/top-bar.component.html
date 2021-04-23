@@ -1,5 +1,13 @@
 <a [routerLink]="['/']">
-  <h1>My Store</h1>
+  <h1>Quotebook</h1>
 </a>
 
-<a class="button fancy-button"><i class="material-icons">shopping_cart</i>Checkout</a>
+<h2 id="user_header" *ngIf="username">Welcome {{ username }}</h2>
+
+<div *ngIf="username; else elseBlock">
+  <a class="button fancy-button" (click)="logoutClick()"><i class="material-icons">vpn_key</i>Log Out</a>
+</div>
+
+<ng-template #elseBlock>
+  <a class="button fancy-button" href="/"><i class="material-icons">vpn_key</i>Log In</a>
+</ng-template>
