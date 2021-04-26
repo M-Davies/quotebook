@@ -1,4 +1,4 @@
 node_modules/
 package-lock.json
 .env
-src/app/firebase.ts
+src/app/config.ts

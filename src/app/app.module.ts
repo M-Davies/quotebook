@@ -12,7 +12,7 @@ import { AuthenticationComponent } from './authentication/authentication.compone
 import { QuoteFeedComponent } from './quote-feed/quote-feed.component';
 
 import firebase from 'firebase/app';
-import { config } from './firebase';
+import { config } from './config';
 firebase.initializeApp(config);
 
 @NgModule({
