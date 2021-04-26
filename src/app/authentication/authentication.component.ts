@@ -21,11 +21,7 @@ export class AuthenticationComponent implements OnInit {
     ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-          // Set login status to true in database and save token
-          firebase.database().ref(`users/${authResult.user.displayName}`).set({
-            name: authResult.user.displayName,
-            status: "AUTHENTICATED"
-          });
+          // Save token
           sessionStorage.setItem("username", authResult.user.displayName);
           return true;
         },
