@@ -1,0 +1,14 @@
+.feed-container {
+    padding: 2%;
+    width: 100vh;
+    height: 100%;
+}
+
+#save_button {
+    width: 50%;
+    margin-left: 1%;
+}
+
+#clear_button {
+    width: 49%;
+}
