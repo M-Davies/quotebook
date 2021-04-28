@@ -8,14 +8,15 @@ import firebase from 'firebase/app'
 })
 export class QuoteFeedComponent {
   quotes = {};
+  currentUser = sessionStorage.getItem('username');
 
   constructor() {
     // If user logged out, redirect to auth
-    if (!sessionStorage.getItem('username')) {
+    if (!this.currentUser) {
       window.location.href = "/"
     } else {
       // Collect quotes from db
-      firebase.database().ref('quotes/').on('value', (snapshot) => {
+      firebase.database().ref(this.currentUser + "quote").on('value', (snapshot) => {
         const savedQuotes = snapshot.val();
         this.quotes = savedQuotes
         // Uncomment this if you wish to iterate over the author and quotes
@@ -26,6 +27,10 @@ export class QuoteFeedComponent {
         } */
       });
     }
+  }
+
+  timestampToDate(timestamp) {
+    return new Date(timestamp).toUTCString()
   }
 
   saveClick() {
@@ -42,14 +47,42 @@ export class QuoteFeedComponent {
 
     // Save quote & author to firebase
     try {
-      let authorRef = firebase.database().ref('quotes/' + author);
-      authorRef.push({
-        quote: quote,
-        timestamp: (new Date).getTime()
-      })
+      // Get author quotes if there are any
+      let authorQuotes = [];
+      const authorRef = firebase.database().ref(this.currentUser + "quotes" + author)
+      authorRef.get().then((snapshot) => {
+        // No need for an else as it might be the first time an author has been added
+        if (snapshot.exists()) {
+          authorQuotes = Array.from(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Could not get author quotes");
+        return window.location.reload();
+      });
+
+      // Append new quote
+      authorQuotes.push({quote: quote, timestamp: (new Date).getTime().toString()})
+
+      // Sort author quotes in chronological order
+      const sortedQuotes = authorQuotes.sort(function compare(quoteObjA, quoteObjB) {
+        const timestampOfA = parseInt(quoteObjA['timestamp']);
+        const timestampOfB = parseInt(quoteObjB['timestamp']);
+        if (timestampOfA < timestampOfB) {
+          return -1;
+        } else if (timestampOfA > timestampOfB) {
+          return 1;
+        } else {
+          // Two timestamps are equal, doesn't matter which goes first
+          return 0;
+        }
+      });
+
+      // Push updated quotes to firebase
+      authorRef.set(sortedQuotes);
     } catch (err) {
+      console.error(err)
       alert("Failed to upload quote, please try again later")
-      return window.location.reload();
     }
 
     // Assume quote was successfully uploaded, refresh so it appears
