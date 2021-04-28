@@ -7,7 +7,7 @@ import firebase from 'firebase/app'
   styleUrls: ['./quote-feed.component.css']
 })
 export class QuoteFeedComponent {
-  quotes;
+  quoteArr = [];
   currentUser = sessionStorage.getItem('username');
 
   constructor() {
@@ -16,31 +16,30 @@ export class QuoteFeedComponent {
       window.location.href = "/";
     } else {
       // Collect quotes from db
-      firebase.database().ref(`${this.currentUser}/quotes`).on('value', (snapshot) => {
-        this.quotes = snapshot.val();
-
-        // Sort author quotes by timestamp
-        for (const [author, quotes] of Object.entries(this.quotes)) {
-          if (Object.keys(quotes).length > 1) {
-            let tempQuotes = [];
-            for (const quoteObj of Object.values(quotes)) {
-              tempQuotes.push(quoteObj);
-            }
-
-            const sortedQuotes = tempQuotes.sort(function compare(firstEl, secondEl) {
-              const timestampA = parseInt(firstEl.timestamp);
-              const timestampB = parseInt(secondEl.timestamp);
-              if ( timestampA > timestampB ){
-                return -1;
-              } else if ( timestampA < timestampB ){
-                return 1;
-              } else {
-                return 0;
-              }
-            });
-
-            this.quotes[author] = sortedQuotes;
+      const quotesRef = firebase.database().ref(`${this.currentUser}/quotes`).orderByChild('timestamp');
+      quotesRef.on('value', (snapshot) => {
+        const quotes = snapshot.val();
+        if (quotes) {
+          // Reverse the quote list as it's in ascending order
+          for (const [quoteId, quoteObj] of Object.entries(quotes)) {
+            let newQuote = quoteObj;
+            newQuote[quoteId] = quoteObj;
+            this.quoteArr.push(newQuote);
           }
+
+          const sortedQuotes = this.quoteArr.sort(function compare(firstEl, secondEl) {
+            const timestampA = parseInt(firstEl['timestamp']);
+            const timestampB = parseInt(secondEl['timestamp']);
+            if ( timestampA > timestampB ){
+              return -1;
+            } else if ( timestampA < timestampB ){
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+
+          this.quoteArr = sortedQuotes;
         }
       });
     }
@@ -65,21 +64,16 @@ export class QuoteFeedComponent {
     // Save quote & author to firebase
     try {
       // Get author quotes if there are any & sort
-      const authorRef = firebase.database().ref(`${this.currentUser}/quotes/${author}`);
-      authorRef.get().then((snapshot) => {
-        // No need for an else as it might be the first time an author has been added
-        if (snapshot.exists()) {
-          console.log("Snapshot from quote save");
-          console.log(snapshot.val());
-        }
-      }).catch((error) => {
+      const quotesRef = firebase.database().ref(`${this.currentUser}/quotes`);
+      quotesRef.get().catch((error) => {
         console.error(error);
         alert("Could not get author quotes");
         return window.location.reload();
       });
 
       // Append new quote
-      authorRef.push({
+      quotesRef.push({
+        author: author,
         quote: quote,
         timestamp: (new Date).getTime().toString(),
         htmlId: `id${Math.floor(Math.random() * 1000000000).toString()}`
@@ -87,11 +81,11 @@ export class QuoteFeedComponent {
     } catch (err) {
       console.error(err);
       alert("Failed to upload quote, please try again later");
-      return window.location.reload();
     }
 
     // Assume quote was successfully uploaded, clear contents of quoteboxes
     this.clearClick();
+    return window.location.reload();
   }
 
   clearClick() {

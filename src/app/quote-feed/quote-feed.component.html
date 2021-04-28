@@ -29,40 +29,38 @@
         aria-describedby="search-addon"
     />
 
-    <div *ngIf="quotes !== {}; else noQuotes">
+    <div *ngIf="quoteArr !== []; else noQuotes">
 
         <div class="accordion" id="quote_accordion">
-            <div *ngFor="let authorItem of quotes | keyvalue">
-                <div *ngFor="let quoteItem of authorItem.value | keyvalue">
+            <div *ngFor="let quoteObj of quoteArr">
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="{{ quoteItem.key }}">
+                        <h2 class="accordion-header" id="{{ quoteObj.author }}">
                             <button
                                 class="accordion-button"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                [attr.data-bs-target]="'#' + quoteItem.value['htmlId']"
+                                [attr.data-bs-target]="'#' + quoteObj.htmlId"
                                 aria-expanded="false"
-                                [attr.aria-controls]="quoteItem.value['htmlId']"
+                                [attr.aria-controls]="quoteObj.htmlId"
                             >
-                                <b>{{ authorItem.key }}</b> <i id="time_container">{{ timestampToDate(quoteItem.value['timestamp']) }}</i>
+                                <b>{{ quoteObj.author }}</b> <i id="time_container">{{ timestampToDate(quoteObj.timestamp) }}</i>
                             </button>
                         </h2>
                         <div
-                            id="{{ quoteItem.value['htmlId'] }}"
+                            id="{{ quoteObj.htmlId }}"
                             class="accordion-collapse collapse show"
-                            [attr.aria-labelledby]="quoteItem.key"
+                            [attr.aria-labelledby]="quoteObj.author"
                             attr.bs-parent="#quote_accordion"
                         >
                             <div class="accordion-body">
-                                "{{ quoteItem.value['quote'] }}"
+                                "{{ quoteObj.quote }}"
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
     <ng-template #noQuotes>
-        <h2>No quotes added yet!</h2>
+        <h2 id="no_quote_header">No quotes added yet!</h2>
     </ng-template>
 </div>
