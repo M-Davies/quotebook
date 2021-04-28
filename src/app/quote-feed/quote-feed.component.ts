@@ -26,6 +26,7 @@ export class QuoteFeedComponent {
             for (const quoteObj of Object.values(quotes)) {
               tempQuotes.push(quoteObj)
             }
+
             const sortedQuotes = tempQuotes.sort(function compare(firstEl, secondEl) {
               const timestampA = parseInt(firstEl.timestamp);
               const timestampB = parseInt(secondEl.timestamp);
@@ -37,6 +38,7 @@ export class QuoteFeedComponent {
                 return 0;
               }
             });
+
             this.quotes[author] = sortedQuotes
           }
         }
@@ -77,7 +79,7 @@ export class QuoteFeedComponent {
       });
 
       // Append new quote
-      authorRef.push({quote: quote, timestamp: (new Date).getTime().toString(), htmlId: Math.floor(Math.random() * 1000000000).toString()})
+      authorRef.push({quote: quote, timestamp: (new Date).getTime().toString(), htmlId: `id${Math.floor(Math.random() * 1000000000).toString()}`})
     } catch (err) {
       console.error(err)
       alert("Failed to upload quote, please try again later")

@@ -40,7 +40,7 @@
                                 class="accordion-button"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                [attr.data-bs-target]="quoteItem.value['htmlId']"
+                                [attr.data-bs-target]="'#' + quoteItem.value['htmlId']"
                                 aria-expanded="false"
                                 [attr.aria-controls]="quoteItem.value['htmlId']"
                             >
@@ -63,6 +63,6 @@
         </div>
     </div>
     <ng-template #noQuotes>
-        <h2>No saved quotes!</h2>
+        <h2>No quotes added yet!</h2>
     </ng-template>
 </div>
