@@ -31,33 +31,30 @@
 
     <div *ngIf="quotes !== {}; else noQuotes">
 
-        <b>Quote Object</b>
-        <p>{{quotes}}</p>
-
         <div class="accordion" id="quote_accordion">
             <div *ngFor="let authorItem of quotes | keyvalue">
                 <div *ngFor="let quoteItem of authorItem.value | keyvalue">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="{{ quoteItem.key }}">
                             <button
-                                class="accordion-button collapsed"
+                                class="accordion-button"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                data-bs-target="#{{ quoteItem.key + quoteItem.value.timestamp }}"
+                                [attr.data-bs-target]="quoteItem.value['htmlId']"
                                 aria-expanded="false"
-                                aria-controls="{{ quoteItem.key + quoteItem.value.timestamp }}"
+                                [attr.aria-controls]="quoteItem.value['htmlId']"
                             >
-                                {{ authorItem.key }} @ {{ timestampToDate(quoteItem.value.timestamp) }}
+                                <b>{{ authorItem.key }}</b> <i id="time_container">{{ timestampToDate(quoteItem.value['timestamp']) }}</i>
                             </button>
                         </h2>
                         <div
-                            id="{{ quoteItem.key + quoteItem.value.timestamp }}"
-                            class="accordion-collapse collapse"
-                            aria-labelledby="{{ quoteItem.key }}"
-                            data-bs-parent="#quote_accordion"
+                            id="{{ quoteItem.value['htmlId'] }}"
+                            class="accordion-collapse collapse show"
+                            [attr.aria-labelledby]="quoteItem.key"
+                            attr.bs-parent="#quote_accordion"
                         >
                             <div class="accordion-body">
-                                "{{ quoteItem.value.quote }}"
+                                "{{ quoteItem.value['quote'] }}"
                             </div>
                         </div>
                     </div>
@@ -66,6 +63,6 @@
         </div>
     </div>
     <ng-template #noQuotes>
-        <h2>No saved quotes! Add some by entering them into the box above</h2>
+        <h2>No saved quotes!</h2>
     </ng-template>
 </div>

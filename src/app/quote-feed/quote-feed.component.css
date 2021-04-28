@@ -12,3 +12,12 @@
 #clear_button {
     width: 49%;
 }
+
+#no_quote_header {
+    text-align: center;
+}
+
+#time_container {
+    position: absolute;
+    right: 10%;
+}
