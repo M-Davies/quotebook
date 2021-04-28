@@ -13,7 +13,7 @@ export class QuoteFeedComponent {
   constructor() {
     // If user logged out, redirect to auth
     if (!this.currentUser) {
-      window.location.href = "/"
+      window.location.href = "/";
     } else {
       // Collect quotes from db
       firebase.database().ref(`${this.currentUser}/quotes`).on('value', (snapshot) => {
@@ -24,7 +24,7 @@ export class QuoteFeedComponent {
           if (Object.keys(quotes).length > 1) {
             let tempQuotes = [];
             for (const quoteObj of Object.values(quotes)) {
-              tempQuotes.push(quoteObj)
+              tempQuotes.push(quoteObj);
             }
 
             const sortedQuotes = tempQuotes.sort(function compare(firstEl, secondEl) {
@@ -39,7 +39,7 @@ export class QuoteFeedComponent {
               }
             });
 
-            this.quotes[author] = sortedQuotes
+            this.quotes[author] = sortedQuotes;
           }
         }
       });
@@ -47,7 +47,7 @@ export class QuoteFeedComponent {
   }
 
   timestampToDate(timestamp) {
-    return new Date(parseInt(timestamp)).toUTCString()
+    return new Date(parseInt(timestamp)).toUTCString();
   }
 
   saveClick() {
@@ -55,7 +55,7 @@ export class QuoteFeedComponent {
     const quote = (<HTMLInputElement> document.getElementById("quote_enter")).value;
     if (!quote) {
       alert("Please enter a quote to save");
-      return window.location.reload();
+      return;
     }
     let author = (<HTMLInputElement> document.getElementById("author_enter")).value;
     if (!author) {
@@ -65,12 +65,12 @@ export class QuoteFeedComponent {
     // Save quote & author to firebase
     try {
       // Get author quotes if there are any & sort
-      const authorRef = firebase.database().ref(`${this.currentUser}/quotes/${author}`)
+      const authorRef = firebase.database().ref(`${this.currentUser}/quotes/${author}`);
       authorRef.get().then((snapshot) => {
         // No need for an else as it might be the first time an author has been added
         if (snapshot.exists()) {
-          console.log("Snapshot from quote save")
-          console.log(snapshot.val())
+          console.log("Snapshot from quote save");
+          console.log(snapshot.val());
         }
       }).catch((error) => {
         console.error(error);
@@ -79,14 +79,19 @@ export class QuoteFeedComponent {
       });
 
       // Append new quote
-      authorRef.push({quote: quote, timestamp: (new Date).getTime().toString(), htmlId: `id${Math.floor(Math.random() * 1000000000).toString()}`})
+      authorRef.push({
+        quote: quote,
+        timestamp: (new Date).getTime().toString(),
+        htmlId: `id${Math.floor(Math.random() * 1000000000).toString()}`
+      });
     } catch (err) {
-      console.error(err)
-      alert("Failed to upload quote, please try again later")
+      console.error(err);
+      alert("Failed to upload quote, please try again later");
+      return window.location.reload();
     }
 
     // Assume quote was successfully uploaded, clear contents of quoteboxes
-    this.clearClick()
+    this.clearClick();
   }
 
   clearClick() {
