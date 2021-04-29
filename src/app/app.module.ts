@@ -5,9 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
-import { ProductListComponent } from './samples/product-list/product-list.component';
-import { ProductAlertsComponent } from './samples/product-alerts/product-alerts.component';
-import { ProductDetailsComponent } from './samples/product-details/product-details.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { QuoteFeedComponent } from './quote-feed/quote-feed.component';
 
@@ -21,17 +18,12 @@ firebase.initializeApp(config);
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: AuthenticationComponent },
-      { path: 'feed', component: QuoteFeedComponent },
-      { path: 'products', component: ProductListComponent },
-      { path: 'products/:productId', component: ProductDetailsComponent },
+      { path: 'feed', component: QuoteFeedComponent }
     ])
   ],
   declarations: [
     AppComponent,
     TopBarComponent,
-    ProductListComponent,
-    ProductAlertsComponent,
-    ProductDetailsComponent,
     AuthenticationComponent,
     QuoteFeedComponent
   ],
