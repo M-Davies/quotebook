@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 import { FirebaseService } from '../services/firebase.service';
 
 @Component({
@@ -9,15 +8,17 @@ import { FirebaseService } from '../services/firebase.service';
 })
 export class QuoteFeedComponent {
   quoteArr = [];
-  currentUser = sessionStorage.getItem('username');
+  username = this.fbService.currentUser;
+  loading = true;
 
   constructor(private fbService: FirebaseService) {
     // If user logged out, redirect to auth
-    if (!this.currentUser) {
+    if (!this.username) {
+      this.loading = false;
       window.location.href = "/";
     } else {
       // Collect quotes from db
-      const quotesRef = this.fbService.getRef(`${this.currentUser}/quotes`).orderByChild('timestamp');
+      const quotesRef = fbService.getRef(`${this.username}/quotes`).orderByChild('timestamp');
       quotesRef.on('value', (snapshot) => {
         const quotes = snapshot.val();
         if (quotes) {
@@ -41,6 +42,10 @@ export class QuoteFeedComponent {
           });
 
           this.quoteArr = sortedQuotes;
+          this.loading = false;
+        } else {
+          // No quotes for this user
+          this.loading = false;
         }
       });
     }
@@ -65,7 +70,7 @@ export class QuoteFeedComponent {
     // Save quote & author to firebase
     try {
       // Get author quotes if there are any & sort
-      const quotesRef = this.fbService.getRef(`${this.currentUser}/quotes`);
+      const quotesRef = this.fbService.getRef(`${this.username}/quotes`);
       quotesRef.get().catch((error) => {
         console.error(error);
         alert("Could not get author quotes");

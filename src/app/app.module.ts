@@ -7,10 +7,7 @@ import { AppComponent } from './app.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { QuoteFeedComponent } from './quote-feed/quote-feed.component';
-
-import firebase from 'firebase/app';
-import { config } from './config';
-firebase.initializeApp(config);
+import { FirebaseService } from './services/firebase.service';
 
 @NgModule({
   imports: [
@@ -31,4 +28,6 @@ firebase.initializeApp(config);
     AppComponent
   ]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private fbService: FirebaseService) {}
+}

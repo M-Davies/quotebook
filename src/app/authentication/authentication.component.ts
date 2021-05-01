@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service'
 
 @Component({
@@ -7,17 +6,15 @@ import { FirebaseService } from '../services/firebase.service'
   templateUrl: './authentication.component.html',
   styleUrls: ['./authentication.component.css']
 })
-export class AuthenticationComponent implements OnInit {
+export class AuthenticationComponent {
 
   constructor(private fbService: FirebaseService) {
     // If user logged in, redirect to feed
-    if (sessionStorage.getItem('username')) {
-      window.location.href = "/feed"
+    if (fbService.currentUser) {
+      window.location.href = "/feed";
+    } else {
+      this.fbService.instantiateUi('#firebaseui-auth-container');
     }
-  }
-
-  ngOnInit(): void {
-    this.fbService.intantiateUi('#firebaseui-auth-container');
   }
 
 }

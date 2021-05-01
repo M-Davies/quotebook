@@ -1,27 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import firebase from 'firebase/app'
+import { Component } from '@angular/core';
+import { FirebaseService } from '../services/firebase.service';
 
 @Component({
   selector: 'app-top-bar',
   templateUrl: './top-bar.component.html',
   styleUrls: ['./top-bar.component.css']
 })
-export class TopBarComponent implements OnInit {
-  username;
+export class TopBarComponent {
+  username = this.fbService.currentUser;
 
-  constructor () {
-  }
-
-  ngOnInit() {
-    const potentialUser = sessionStorage.getItem("username")
-    if (potentialUser) {
-      this.username = potentialUser
-    }
-  }
+  constructor (private fbService: FirebaseService) {}
 
   logoutClick() {
-    firebase.auth().signOut()
-    sessionStorage.removeItem("username")
-    window.location.href = "/"
+    this.fbService.signoutUser();
+    window.location.href = "/";
   }
 }

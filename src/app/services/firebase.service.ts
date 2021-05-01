@@ -1,31 +1,47 @@
 import { Injectable } from '@angular/core';
 import firebase from "firebase/app";
-import * as firebaseui from "firebaseui"
-import 'firebase/database';
+import * as firebaseui from "firebaseui";
+import { config } from '../config';
+firebase.initializeApp(config);
+import 'firebase/database'
+import 'firebase/auth'
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
+  currentUser;
+  auth = firebase.auth();
 
   constructor() {
+    const user = sessionStorage.getItem('username')
+    if (user) {
+      this.currentUser = user
+    }
+  }
 
+  signoutUser() {
+    this.auth.signOut();
+    this.currentUser = undefined;
+    if (sessionStorage.getItem('username')) {
+      sessionStorage.removeItem('username')
+    }
   }
 
   getRef(path) {
-    return firebase.database().ref(path)
+    return firebase.database().ref(path);
   }
 
-  intantiateUi(htmlId) {
-    const ui = new firebaseui.auth.AuthUI(firebase.auth());
+  instantiateUi(htmlId) {
+    const ui = new firebaseui.auth.AuthUI(this.auth);
     ui.start(htmlId, {
       callbacks: {
-        signInSuccessWithAuthResult: function(authResult) {
-          // Save token
-          sessionStorage.setItem("username", authResult.user.displayName);
+        signInSuccessWithAuthResult: (authResult) => {
+          // Save username in storage
+          sessionStorage.setItem('username', authResult.user.displayName);
           return true;
         },
-        uiShown: function() {
+        uiShown: () => {
           // The widget is rendered, hide the loader.
           document.getElementById('loader').style.display = 'none';
         }

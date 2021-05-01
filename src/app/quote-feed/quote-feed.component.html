@@ -1,66 +1,72 @@
 <div class="feed-container">
 
-    <div class="input-group mb-1">
-        <textarea placeholder="Quote" id="quote_enter" class="form-control" aria-label="With textarea"></textarea>
+    <div *ngIf="loading === true; else notLoading">
+        <div class="quote-loader"></div>
     </div>
+    <ng-template #notLoading>
 
-    <div class="input-group mb-1">
+        <div class="input-group mb-1">
+            <textarea placeholder="Quote" id="quote_enter" class="form-control" aria-label="With textarea"></textarea>
+        </div>
+
+        <div class="input-group mb-1">
+            <input
+                id="author_enter"
+                type="text"
+                placeholder="Author (Optional)"
+                class="form-control"
+                aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-default"
+            >
+        </div>
+
+        <button id="clear_button" type="button" (click)="clearClick()" class="btn btn-danger mb-3">Clear</button>
+        <button id="save_button" type="button" (click)="saveClick()" class="btn btn-success mb-3">Save</button>
+
+        <hr>
+
         <input
-            id="author_enter"
-            type="text"
-            placeholder="Author"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-default"
-        >
-    </div>
+            id="search_enter"
+            type="search"
+            class="form-control rounded"
+            placeholder="Search"
+            aria-label="Search"
+            aria-describedby="search-addon"
+        />
 
-    <button id="clear_button" type="button" (click)="clearClick()" class="btn btn-danger mb-3">Clear</button>
-    <button id="save_button" type="button" (click)="saveClick()" class="btn btn-success mb-3">Save</button>
+        <div *ngIf="quoteArr.length > 0; else noQuotes">
 
-    <hr>
-
-    <input
-        id="search_enter"
-        type="search"
-        class="form-control rounded"
-        placeholder="Search"
-        aria-label="Search"
-        aria-describedby="search-addon"
-    />
-
-    <div *ngIf="quoteArr !== []; else noQuotes">
-
-        <div class="accordion" id="quote_accordion">
-            <div *ngFor="let quoteObj of quoteArr">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="{{ quoteObj.author }}">
-                            <button
-                                class="accordion-button"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                [attr.data-bs-target]="'#' + quoteObj.htmlId"
-                                aria-expanded="false"
-                                [attr.aria-controls]="quoteObj.htmlId"
+            <div class="accordion" id="quote_accordion">
+                <div *ngFor="let quoteObj of quoteArr">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="{{ quoteObj.author }}">
+                                <button
+                                    class="accordion-button"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    [attr.data-bs-target]="'#' + quoteObj.htmlId"
+                                    aria-expanded="false"
+                                    [attr.aria-controls]="quoteObj.htmlId"
+                                >
+                                    <b>{{ quoteObj.author }}</b> <i id="time_container">{{ timestampToDate(quoteObj.timestamp) }}</i>
+                                </button>
+                            </h2>
+                            <div
+                                id="{{ quoteObj.htmlId }}"
+                                class="accordion-collapse collapse show"
+                                [attr.aria-labelledby]="quoteObj.author"
+                                attr.bs-parent="#quote_accordion"
                             >
-                                <b>{{ quoteObj.author }}</b> <i id="time_container">{{ timestampToDate(quoteObj.timestamp) }}</i>
-                            </button>
-                        </h2>
-                        <div
-                            id="{{ quoteObj.htmlId }}"
-                            class="accordion-collapse collapse show"
-                            [attr.aria-labelledby]="quoteObj.author"
-                            attr.bs-parent="#quote_accordion"
-                        >
-                            <div class="accordion-body">
-                                "{{ quoteObj.quote }}"
+                                <div class="accordion-body">
+                                    "{{ quoteObj.quote }}"
+                                </div>
                             </div>
                         </div>
-                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <ng-template #noQuotes>
-        <h2 id="no_quote_header">No quotes added yet!</h2>
+        <ng-template #noQuotes>
+            <h2 id="no_quote_header">No quotes added yet!</h2>
+        </ng-template>
     </ng-template>
 </div>
