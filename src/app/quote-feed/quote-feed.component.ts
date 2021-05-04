@@ -10,6 +10,7 @@ export class QuoteFeedComponent {
   quoteArr = [];
   username = this.fbService.currentUser;
   loading = true;
+  quoteExists = false;
 
   /* eslint-disable no-unused-vars */
   constructor(private fbService: FirebaseService) {
@@ -82,7 +83,7 @@ export class QuoteFeedComponent {
     if (searchParam !== "") {
       // Overwrite existing accordion items that have a similar author or quote
       const newQuotes = oldQuotes.filter(quoteObj => {
-        if (quoteObj.author.toLowerCase().includes(searchParam) || quoteObj.quote.toLowerCase().includes(searchParam)) {
+        if (quoteObj.author.trim().toLowerCase().includes(searchParam) || quoteObj.quote.trim().toLowerCase().includes(searchParam)) {
           return true;
         } else {
           return false;
@@ -106,6 +107,20 @@ export class QuoteFeedComponent {
     let author = (<HTMLInputElement> document.getElementById("author_enter")).value;
     if (!author) {
       author = "Anonymous";
+    }
+
+    // Verify quote does not already exist for this author
+    this.quoteArr.forEach(quoteObj => {
+      if (quoteObj.author.trim().toLowerCase() === author.trim().toLowerCase() && quoteObj.quote.trim().toLowerCase() === quote.trim().toLowerCase()) {
+        alert("Quote already exists for this author");
+        this.quoteExists = true;
+        return;
+      }
+    });
+
+    // Have to return again if quote exists as well can't pass the return up the blocks
+    if (this.quoteExists === true) {
+      return;
     }
 
     // Save quote & author to firebase
