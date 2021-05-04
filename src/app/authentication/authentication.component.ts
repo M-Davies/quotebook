@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FirebaseService } from '../services/firebase.service'
+import { FirebaseService } from '../services/firebase.service';
 
 @Component({
   selector: 'app-authentication',
@@ -8,13 +8,12 @@ import { FirebaseService } from '../services/firebase.service'
 })
 export class AuthenticationComponent {
 
-  constructor(private fbService: FirebaseService) {
+  constructor (private fbService: FirebaseService) {
     // If user logged in, redirect to feed
     if (fbService.currentUser) {
       window.location.href = "/feed";
     } else {
-      this.fbService.instantiateUi('#firebaseui-auth-container');
+      this.fbService.instantiateUi();
     }
   }
-
 }

@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import firebase from "firebase/app";
 import * as firebaseui from "firebaseui";
 import { config } from '../config';
+import 'firebase/database';
+import 'firebase/auth';
 firebase.initializeApp(config);
-import 'firebase/database'
-import 'firebase/auth'
 
 @Injectable({
   providedIn: 'root'
@@ -13,28 +13,28 @@ export class FirebaseService {
   currentUser;
   auth = firebase.auth();
 
-  constructor() {
-    const user = sessionStorage.getItem('username')
-    if (user) {
-      this.currentUser = user
+  constructor () {
+    const username = sessionStorage.getItem('username');
+    if (username) {
+      this.currentUser = username;
     }
   }
 
-  signoutUser() {
+  signoutUser () {
     this.auth.signOut();
     this.currentUser = undefined;
     if (sessionStorage.getItem('username')) {
-      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('username');
     }
   }
 
-  getRef(path) {
+  getRef (path) {
     return firebase.database().ref(path);
   }
 
-  instantiateUi(htmlId) {
+  instantiateUi () {
     const ui = new firebaseui.auth.AuthUI(this.auth);
-    ui.start(htmlId, {
+    ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: (authResult) => {
           // Save username in storage
@@ -60,5 +60,4 @@ export class FirebaseService {
       ]
     });
   }
-
 }

@@ -1,3 +1,4 @@
+/*eslint-disable no-unused-vars*/
 import { Component } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 
