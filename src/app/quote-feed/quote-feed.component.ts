@@ -11,6 +11,7 @@ export class QuoteFeedComponent {
   username = this.fbService.currentUser;
   loading = true;
 
+  /* eslint-disable no-unused-vars */
   constructor(private fbService: FirebaseService) {
     // If user logged out, redirect to auth
     if (!this.username) {
@@ -18,36 +19,76 @@ export class QuoteFeedComponent {
       window.location.href = "/";
     } else {
       // Collect quotes from db
-      const quotesRef = fbService.getRef(`${this.username}/quotes`).orderByChild('timestamp');
-      quotesRef.on('value', (snapshot) => {
-        const quotes = snapshot.val();
-        if (quotes) {
-          // Reverse the quote list as it's in ascending order
-          for (const [quoteId, quoteObj] of Object.entries(quotes)) {
-            let newQuote = quoteObj;
-            newQuote[quoteId] = quoteObj;
-            this.quoteArr.push(newQuote);
+      this.gatherQuotes();
+    }
+  }
+
+  isQuoteInArr(quote): boolean {
+    // Checks if the quote already exists in the array, returning true if that's the case, false otherwise
+    let inArr = false;
+    if (this.quoteArr) {
+      for (const quoteObj of this.quoteArr) {
+        // There is a bug with this in that if there two identical quotes by the same author then it will not view the old one
+        if (quoteObj['quote'].includes(quote)) {
+          inArr = true;
+          break;
+        }
+      }
+    }
+    return inArr;
+  }
+
+  async gatherQuotes() {
+    const quotesRef = this.fbService.getRef(`${this.username}/quotes`).orderByChild('timestamp');
+    await quotesRef.on('value', (snapshot) => {
+      const quotes = snapshot.val();
+      if (quotes) {
+        // Order the list by highest timestamp first & eliminate duplicate values
+        for (const [quoteId, quoteObj] of Object.entries(quotes)) {
+          if (!this.isQuoteInArr(quoteObj["quote"])) {
+            this.quoteArr.push(quoteObj);
           }
+        }
 
-          const sortedQuotes = this.quoteArr.sort(function compare(firstEl, secondEl) {
-            const timestampA = parseInt(firstEl['timestamp']);
-            const timestampB = parseInt(secondEl['timestamp']);
-            if ( timestampA > timestampB ){
-              return -1;
-            } else if ( timestampA < timestampB ){
-              return 1;
-            } else {
-              return 0;
-            }
-          });
+        const sortedQuotes = this.quoteArr.sort(function compare(firstEl, secondEl) {
+          const timestampA = parseInt(firstEl['timestamp']);
+          const timestampB = parseInt(secondEl['timestamp']);
+          if (timestampA > timestampB){
+            return -1;
+          } else if (timestampA < timestampB){
+            return 1;
+          } else {
+            return 0;
+          }
+        });
 
-          this.quoteArr = sortedQuotes;
-          this.loading = false;
+        this.quoteArr = sortedQuotes;
+        this.loading = false;
+      } else {
+        // No quotes for this user
+        this.loading = false;
+      }
+    });
+  }
+
+  async filterQuotes() {
+    // Reset quotes
+    await this.gatherQuotes();
+    const oldQuotes = this.quoteArr;
+
+    // Get content of search field
+    const searchParam = (<HTMLInputElement> document.getElementById("search_enter")).value.toLowerCase();
+
+    if (searchParam !== "") {
+      // Overwrite existing accordion items that have a similar author or quote
+      const newQuotes = oldQuotes.filter(quoteObj => {
+        if (quoteObj.author.toLowerCase().includes(searchParam) || quoteObj.quote.toLowerCase().includes(searchParam)) {
+          return true;
         } else {
-          // No quotes for this user
-          this.loading = false;
+          return false;
         }
       });
+      this.quoteArr = newQuotes;
     }
   }
 
@@ -87,11 +128,11 @@ export class QuoteFeedComponent {
     } catch (err) {
       console.error(err);
       alert("Failed to upload quote, please try again later");
+      return window.location.reload();
     }
 
-    // Assume quote was successfully uploaded, clear contents of quoteboxes
+    // Assume quote was successfully uploaded, clear contents of input boxes
     this.clearClick();
-    return window.location.reload();
   }
 
   clearClick() {

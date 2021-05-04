@@ -32,6 +32,7 @@
             placeholder="Search"
             aria-label="Search"
             aria-describedby="search-addon"
+            (change)="filterQuotes()"
         />
 
         <div *ngIf="quoteArr.length > 0; else noQuotes">
@@ -66,7 +67,7 @@
             </div>
         </div>
         <ng-template #noQuotes>
-            <h2 id="no_quote_header">No quotes added yet!</h2>
+            <h2 id="no_quote_header">No quotes</h2>
         </ng-template>
     </ng-template>
 </div>
