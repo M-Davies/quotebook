@@ -145,4 +145,16 @@ describe('QuoteFeedComponent', () => {
         previousTimestamp = parseInt(quote.timestamp);
       }
   });
+
+  it('should filter quotes by the author keyword in search field', () => {
+    const compiled = fixture.nativeElement;
+    compiled.querySelector('#search_enter').value = "multiple";
+    expect(component.quoteArr.length).toEqual(2);
+  });
+
+  it('should filter quotes by the quote keyword in search field', () => {
+    const compiled = fixture.nativeElement;
+    compiled.querySelector('#search_enter').value = "second";
+    expect(component.quoteArr.length).toEqual(1);
+  });
 });
