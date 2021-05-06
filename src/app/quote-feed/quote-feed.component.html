@@ -60,6 +60,14 @@
                             >
                                 <div class="accordion-body">
                                     "{{ quoteObj.quote }}"
+                                    <button
+                                        class="button fancy-button"
+                                        (click)="copyClick(quoteObj.id, quoteObj.author, quoteObj.quote)"
+                                        (mouseout)="mouseOut(quoteObj.id)"
+                                    >
+                                        <span class="tooltiptext" id="{{ quoteObj.id }}"></span>
+                                        <span class="material-icons">content_copy</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

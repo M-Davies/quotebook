@@ -47,6 +47,7 @@ export class QuoteFeedComponent {
         // Order the list by highest timestamp first & eliminate duplicate values
         for (const [quoteId, quoteObj] of Object.entries(quotes)) {
           if (!this.isQuoteInArr(quoteObj["quote"])) {
+            quoteObj['id'] = quoteId;
             this.quoteArr.push(quoteObj);
           }
         }
@@ -95,6 +96,51 @@ export class QuoteFeedComponent {
 
   timestampToDate(timestamp) {
     return new Date(parseInt(timestamp)).toUTCString();
+  }
+
+  copyClick(id, author, quote) {
+    // Spawn sandbox area to craft copy text
+    const sandbox = document.createElement("textarea");
+
+    // Place in the top-left corner of screen regardless of scroll position.
+    sandbox.style.position = 'fixed';
+
+    // Ensure it has a small width and height. Setting to 1px / 1em doesn't work as this gives a negative w/h on some browsers.
+    sandbox.style.width = '2em';
+    sandbox.style.height = '2em';
+
+    // Clean up any borders.
+    sandbox.style.border = 'none';
+    sandbox.style.outline = 'none';
+    sandbox.style.boxShadow = 'none';
+
+    // Avoid flash of the white box if rendered for any reason.
+    sandbox.style.background = 'transparent';
+
+    // Construct clipboard format and target for copying
+    sandbox.value = `${quote.replace(/(\r\n|\n|\r)/gm, "").trim()}\n(${author.replace(/(\r\n|\n|\r)/gm, "").trim()})`;
+    document.body.appendChild(sandbox);
+    sandbox.focus();
+    sandbox.select();
+
+    // Try to copy and display tooltip response
+    const tooltip = document.getElementById(id);
+    try {
+      document.execCommand('copy');
+      tooltip.style.color = 'green';
+      tooltip.style.zIndex = "10000000000000";
+      tooltip.innerHTML = "Copied!";
+    } catch (err) {
+      tooltip.style.color = 'red';
+      tooltip.innerHTML = "Failed to copy to clipboard!";
+    }
+
+    // Remove sandbox textarea element after all is done
+    document.body.removeChild(sandbox);
+  }
+
+  mouseOut(id) {
+    document.getElementById(id).innerHTML = "";
   }
 
   saveClick() {

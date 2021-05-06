@@ -14,25 +14,29 @@ describe('QuoteFeedComponent', () => {
       author: "Anonymous",
       htmlId: "id558091592",
       quote: "This is a test anon quote",
-      timestamp: "1619987133185"
+      timestamp: "1619987133185",
+      id: "-MZOaG1y8UColCvae4nj"
     },
     {
       author: "Test Author",
       htmlId: "id229603787",
       quote: "This is a test labelled quote",
-      timestamp: "1619987151265"
+      timestamp: "1619987151265",
+      id: "-MZLaG1Y8UColCEae45j"
     },
     {
       author: "Test Multiple Author",
       htmlId: "id501804608",
       quote: "This is the first test labelled quote",
-      timestamp: "1619987202597"
+      timestamp: "1619987202597",
+      id: "-MZOaGNy8UC0lCvae4nM"
     },
     {
       author: "Test Multiple Author",
       htmlId: "id690004058",
       quote: "This is the second test labelled quote",
-      timestamp: "1619987229222"
+      timestamp: "1619987229222",
+      id: "-MZOAG1y8uColC9ae4nj"
     }
   ];
 
@@ -156,5 +160,16 @@ describe('QuoteFeedComponent', () => {
     const compiled = fixture.nativeElement;
     compiled.querySelector('#search_enter').value = "second";
     expect(component.quoteArr.length).toEqual(1);
+  });
+
+  it('should copy quote to clipboard in correct format on copy click', () => {
+    const compiled = fixture.nativeElement;
+    TEST_QUOTES.forEach(function (quoteItem) {
+      compiled.querySelector(quoteItem.id).click();
+      navigator.clipboard.readText()
+        .then(clipboardContent => {
+          expect(clipboardContent).toEqual(`${quoteItem.quote.replace(/(\r\n|\n|\r)/gm, "").trim()}\n(${quoteItem.author.replace(/(\r\n|\n|\r)/gm, "").trim()})`);
+        });
+    });
   });
 });
