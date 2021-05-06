@@ -1,6 +1,6 @@
 .feed-container {
     padding: 2%;
-    width: 100vh;
+    width: 100%;
     height: 100%;
 }
 
@@ -72,9 +72,4 @@ button.fancy-button {
 
 #no_quote_header {
     text-align: center;
-}
-
-#time_container {
-    position: absolute;
-    right: 10%;
 }

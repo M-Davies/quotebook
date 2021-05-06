@@ -95,7 +95,21 @@ export class QuoteFeedComponent {
   }
 
   timestampToDate(timestamp) {
-    return new Date(parseInt(timestamp)).toUTCString();
+    const timestampDate = new Date(parseInt(timestamp));
+    let hours, minutes;
+    if (timestampDate.getHours() < 10) {
+      hours = `0${timestampDate.getHours()}`;
+    } else {
+      hours = timestampDate.getHours();
+    }
+
+    if (timestampDate.getMinutes() < 10) {
+      minutes = `0${timestampDate.getMinutes()}`;
+    } else {
+      minutes = timestampDate.getMinutes();
+    }
+
+    return `${timestampDate.getDate()}/${timestampDate.getMonth()}/${timestampDate.getFullYear()} ${hours}:${minutes}`;
   }
 
   copyClick(id, author, quote) {

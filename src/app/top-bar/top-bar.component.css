@@ -1,0 +1,9 @@
+#app_header {
+    color: white;
+}
+
+#user_header {
+    color: white;
+    font-weight: bolder;
+    margin-right: 3%;
+}

@@ -49,7 +49,7 @@
                                     aria-expanded="false"
                                     [attr.aria-controls]="quoteObj.htmlId"
                                 >
-                                    <b>{{ quoteObj.author }}</b> <i id="time_container">{{ timestampToDate(quoteObj.timestamp) }}</i>
+                                    <b>{{ quoteObj.author }}</b>
                                 </button>
                             </h2>
                             <div
@@ -60,6 +60,8 @@
                             >
                                 <div class="accordion-body">
                                     "{{ quoteObj.quote }}"
+                                    <br>
+                                    <i>{{ timestampToDate(quoteObj.timestamp) }}</i>
                                     <button
                                         class="button fancy-button"
                                         (click)="copyClick(quoteObj.id, quoteObj.author, quoteObj.quote)"
