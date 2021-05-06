@@ -200,7 +200,6 @@ export class QuoteFeedComponent {
     // Clear all input groups (have to cast as value doesn't exist otherwise)
     (<HTMLInputElement> document.getElementById("quote_enter")).value = '';
     (<HTMLInputElement> document.getElementById("author_enter")).value = '';
-    (<HTMLInputElement> document.getElementById("search_enter")).value = '';
   }
 
 }
