@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import firebase from "firebase/app";
 import * as firebaseui from "firebaseui";
-import { config } from '../config';
+import { config } from './config';
 import 'firebase/database';
 import 'firebase/auth';
 firebase.initializeApp(config);

@@ -1,4 +1,4 @@
 node_modules/
 package-lock.json
 .env
-src/app/config.ts
+**/config.ts
