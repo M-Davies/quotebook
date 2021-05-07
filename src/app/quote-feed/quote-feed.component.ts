@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewChecked, Component } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 
 @Component({
@@ -6,11 +6,13 @@ import { FirebaseService } from '../services/firebase.service';
   templateUrl: './quote-feed.component.html',
   styleUrls: ['./quote-feed.component.css']
 })
-export class QuoteFeedComponent {
+export class QuoteFeedComponent implements AfterViewChecked {
   quoteArr = [];
+  randomQuote = {};
   username = this.fbService.currentUser;
   loading = true;
   quoteExists = false;
+  shownRndQuote = false;
 
   /* eslint-disable no-unused-vars */
   constructor(private fbService: FirebaseService) {
@@ -19,8 +21,18 @@ export class QuoteFeedComponent {
       this.loading = false;
       window.location.href = "/";
     } else {
-      // Collect quotes from db
+      // Generate random quote
+      this.generateRandomQuote();
+
+      // Collect user quotes from db
       this.gatherQuotes();
+    }
+  }
+
+  ngAfterViewChecked() {
+    if (this.loading === false && this.shownRndQuote === false) {
+      document.getElementById('show_random_quote').click();
+      this.shownRndQuote = true;
     }
   }
 
@@ -37,6 +49,22 @@ export class QuoteFeedComponent {
       }
     }
     return inArr;
+  }
+
+  async generateRandomQuote() {
+    return await fetch('https://type.fit/api/quotes')
+      .then(data => {
+        return data.json();
+      })
+      .then(quotes => {
+        const randomQuoteArr = Array.from(quotes);
+
+        // Convert random quote from arr to JSON then convert to obj
+        this.randomQuote = JSON.parse(JSON.stringify(randomQuoteArr[Math.floor(Math.random() * randomQuoteArr.length - 1)]));
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
   }
 
   async gatherQuotes() {
@@ -157,14 +185,23 @@ export class QuoteFeedComponent {
     document.getElementById(id).innerHTML = "";
   }
 
-  saveClick() {
+  saveClick(authorEle: string, quoteEle: string, content: boolean) {
     // Get contents of quote and author
-    const quote = (<HTMLInputElement> document.getElementById("quote_enter")).value;
+    let quote: string, author: string;
+
+    if (content === true) {
+      quote = quoteEle;
+      author = authorEle;
+    } else {
+      quote = (<HTMLInputElement> document.getElementById(quoteEle)).value;
+      author = (<HTMLInputElement> document.getElementById(authorEle)).value;
+    }
+
     if (!quote) {
       alert("Please enter a quote to save");
       return;
     }
-    let author = (<HTMLInputElement> document.getElementById("author_enter")).value;
+
     if (!author) {
       author = "Anonymous";
     }
@@ -207,7 +244,11 @@ export class QuoteFeedComponent {
     }
 
     // Assume quote was successfully uploaded, clear contents of input boxes
-    this.clearClick();
+    if (content === true) {
+      document.getElementById('random_quote_close').click();
+    } else {
+      this.clearClick();
+    }
   }
 
   clearClick() {

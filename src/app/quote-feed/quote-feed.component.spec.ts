@@ -172,4 +172,19 @@ describe('QuoteFeedComponent', () => {
         });
     });
   });
+
+  it('should generate a random quote on page load', () => {
+    const compiled = fixture.nativeElement;
+    expect(component.randomQuote).toBeTruthy();
+    expect(compiled.querySelector('#random_quote_author').value).toBeTruthy();
+    expect(compiled.querySelector('#random_quote_quote').value).toBeTruthy();
+  });
+
+  it('should save the random quote to user quotes on save click', () => {
+    const compiled = fixture.nativeElement;
+    const quoteLen = component.quoteArr.length;
+    compiled.querySelector('#save_random_quote').click();
+    const newQuoteLen = component.quoteArr.length;
+    expect(newQuoteLen).toBeGreaterThan(quoteLen);
+  });
 });

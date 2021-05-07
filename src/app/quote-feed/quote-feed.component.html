@@ -21,7 +21,7 @@
         </div>
 
         <button id="clear_button" type="button" (click)="clearClick()" class="btn btn-danger mb-3">Clear</button>
-        <button id="save_button" type="button" (click)="saveClick()" class="btn btn-success mb-3">Save</button>
+        <button id="save_button" type="button" (click)="saveClick('author_enter', 'quote_enter', false)" class="btn btn-success mb-3">Save</button>
 
         <hr>
 
@@ -35,44 +35,83 @@
             (change)="filterQuotes()"
         />
 
-        <div *ngIf="quoteArr.length > 0; else noQuotes">
+        <button
+            id="show_random_quote"
+            class="btn btn-primary"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasLeft"
+            aria-controls="offcanvasLeft"
+            hidden=true
+        ></button>
 
+        <div
+            class="offcanvas offcanvas-start"
+            tabindex="-1"
+            id="offcanvasLeft"
+            aria-labelledby="offcanvasLeftLabel"
+        >
+            <div class="offcanvas-header">
+                <h5 id="offcanvasLeftLabel">Quote of the day</h5>
+                <button
+                    id="random_quote_close"
+                    type="button"
+                    class="btn-close text-reset"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="offcanvas-body">
+                <b id="random_quote_author">{{ randomQuote['author'] }}</b>
+                <p id="random_quote_quote">"{{ randomQuote['text'] }}"</p>
+                <button
+                    type="button"
+                    id="save_random_quote"
+                    (click)="saveClick(randomQuote['author'], randomQuote['text'], true)"
+                    class="btn btn-success mb-3"
+                >
+                    Save Quote
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="quoteArr.length > 0; else noQuotes">
             <div class="accordion" id="quote_accordion">
                 <div *ngFor="let quoteObj of quoteArr">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="{{ quoteObj.author }}">
-                                <button
-                                    class="accordion-button"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    [attr.data-bs-target]="'#' + quoteObj.htmlId"
-                                    aria-expanded="false"
-                                    [attr.aria-controls]="quoteObj.htmlId"
-                                >
-                                    <b>{{ quoteObj.author }}</b>
-                                </button>
-                            </h2>
-                            <div
-                                id="{{ quoteObj.htmlId }}"
-                                class="accordion-collapse collapse show"
-                                [attr.aria-labelledby]="quoteObj.author"
-                                attr.bs-parent="#quote_accordion"
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="{{ quoteObj.author }}">
+                            <button
+                                class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                [attr.data-bs-target]="'#' + quoteObj.htmlId"
+                                aria-expanded="false"
+                                [attr.aria-controls]="quoteObj.htmlId"
                             >
-                                <div class="accordion-body">
-                                    "{{ quoteObj.quote }}"
-                                    <br>
-                                    <i>{{ timestampToDate(quoteObj.timestamp) }}</i>
-                                    <button
-                                        class="button fancy-button"
-                                        (click)="copyClick(quoteObj.id, quoteObj.author, quoteObj.quote)"
-                                        (mouseout)="mouseOut(quoteObj.id)"
-                                    >
-                                        <span class="tooltiptext" id="{{ quoteObj.id }}"></span>
-                                        <span class="material-icons">content_copy</span>
-                                    </button>
-                                </div>
+                                <b>{{ quoteObj.author }}</b>
+                            </button>
+                        </h2>
+                        <div
+                            id="{{ quoteObj.htmlId }}"
+                            class="accordion-collapse collapse show"
+                            [attr.aria-labelledby]="quoteObj.author"
+                            attr.bs-parent="#quote_accordion"
+                        >
+                            <div class="accordion-body">
+                                "{{ quoteObj.quote }}"
+                                <br>
+                                <i>{{ timestampToDate(quoteObj.timestamp) }}</i>
+                                <button
+                                    class="button fancy-button"
+                                    (click)="copyClick(quoteObj.id, quoteObj.author, quoteObj.quote)"
+                                    (mouseout)="mouseOut(quoteObj.id)"
+                                >
+                                    <span class="tooltiptext" id="{{ quoteObj.id }}"></span>
+                                    <span class="material-icons">content_copy</span>
+                                </button>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
