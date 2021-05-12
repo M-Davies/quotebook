@@ -1,13 +1,14 @@
 /*eslint-env jasmine*/
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { QuoteFeedComponent } from './quote-feed.component';
 import { FirebaseService } from '../services/firebase.service';
 
-describe('QuoteFeedComponent', () => {
+describe('QuoteFeedComponent_Logged_In', () => {
   let component: QuoteFeedComponent;
   let fixture: ComponentFixture<QuoteFeedComponent>;
-
+  let service: FirebaseService;
+  let compiled;
   const TEST_USERNAME = 'testusername';
   const TEST_QUOTES = [
     {
@@ -15,52 +16,54 @@ describe('QuoteFeedComponent', () => {
       htmlId: "id558091592",
       quote: "This is a test anon quote",
       timestamp: "1619987133185",
-      id: "-MZOaG1y8UColCvae4nj"
+      id: ""
     },
     {
       author: "Test Author",
       htmlId: "id229603787",
       quote: "This is a test labelled quote",
       timestamp: "1619987151265",
-      id: "-MZLaG1Y8UColCEae45j"
+      id: ""
     },
     {
       author: "Test Multiple Author",
       htmlId: "id501804608",
       quote: "This is the first test labelled quote",
       timestamp: "1619987202597",
-      id: "-MZOaGNy8UC0lCvae4nM"
+      id: ""
     },
     {
       author: "Test Multiple Author",
       htmlId: "id690004058",
       quote: "This is the second test labelled quote",
       timestamp: "1619987229222",
-      id: "-MZOAG1y8uColC9ae4nj"
+      id: ""
     }
   ];
 
   async function resetFirebaseDb() {
-    const service = TestBed.inject(FirebaseService);
-    const ref = await service.getRef(`${TEST_USERNAME}/quotes`);
-    ref.set({});
-    for (const quote in TEST_QUOTES) {
-      ref.push(quote);
-    }
+    const quotesRef = await service.getRef(`${TEST_USERNAME}/quotes`);
+    await quotesRef.remove().then(async () => {
+      TEST_QUOTES.forEach(async function (quote) {
+        const fullPath = await quotesRef.push();
+        const dbId = fullPath.toString().split("/").pop();
+        quote.id = dbId;
+        await quotesRef.child(dbId).set(quote);
+      });
+    });
   }
 
   beforeEach(async () => {
     sessionStorage.setItem('username', TEST_USERNAME);
-    resetFirebaseDb();
     await TestBed.configureTestingModule({
-      declarations: [ QuoteFeedComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(QuoteFeedComponent);
+      declarations: [ QuoteFeedComponent ],
+      schemas: [ NO_ERRORS_SCHEMA ]
+    }).compileComponents();
+    service = await TestBed.inject(FirebaseService);
+    await resetFirebaseDb();
+    fixture = await TestBed.createComponent(QuoteFeedComponent);
     component = fixture.componentInstance;
+    await component.gatherQuotes();
     fixture.detectChanges();
   });
 
@@ -69,74 +72,74 @@ describe('QuoteFeedComponent', () => {
     expect(component.username).toBeTruthy();
   });
 
-  it('should redirect on user logged out', () => {
-    sessionStorage.removeItem('username');
-    expect(component).toBeFalsy();
-    expect(component.username).toBeFalsy();
-  });
-
   it('should render quote input component', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#quote_enter')).toBeTruthy();
   });
 
   it('should render author input component', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#author_enter')).toBeTruthy();
   });
 
   it('should render clear input button', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#clear_button')).toBeTruthy();
   });
 
   it('should clear input of all input fields on clear button click', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     compiled.querySelector('#quote_enter').value = "test quote";
     compiled.querySelector('#author_enter').value = "test author";
-    compiled.querySelector('#search_enter').value = "test search";
     compiled.querySelector('#clear_button').click();
     expect(compiled.querySelector('#quote_enter').value).toBeFalsy();
     expect(compiled.querySelector('#author_enter').value).toBeFalsy();
-    expect(compiled.querySelector('#search_enter').value).toBeFalsy();
   });
 
   it('should render save input button', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#save_button')).toBeTruthy();
   });
 
   it('should create alert on empty quote field on save button click', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     compiled.querySelector('#author_enter').value = "testing if author is created";
-    spyOn(compiled, 'alert');
+    const alertSpy = spyOn(window, 'alert');
     compiled.querySelector('#save_button').click();
-    expect(compiled.alert).toHaveBeenCalledWith('Please enter a quote to save');
+    expect(alertSpy).toHaveBeenCalled();
   });
 
   it('should render search input component', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#search_enter')).toBeTruthy();
   });
 
   it('should render quote accordion component', () => {
-    const compiled = fixture.nativeElement;
+    compiled = fixture.nativeElement;
     expect(compiled.querySelector('#quote_accordion')).toBeTruthy();
   });
 
   it('should create same number of accordion quotes of the same length as the test quotes', () => {
-    const compiled = fixture.nativeElement;
-    const quoteItems = compiled.getElementsByClassName('.accordion-item');
+    compiled = fixture.nativeElement;
+    const quoteItems = compiled.getElementsByClassName('accordion-item');
     expect(quoteItems.length).toEqual(TEST_QUOTES.length);
   });
 
   it('should contain accordion quote that has the same author and message as one of the declared test quotes', () => {
-    const compiled = fixture.nativeElement;
-    const quoteHeaders = compiled.querySelectorAll('.accordion-header').classList;
-    const quoteContent = compiled.querySelectorAll('.accordion-body').classList;
+    compiled = fixture.nativeElement;
+    let quoteHeaders = [];
+    compiled.querySelectorAll('.accordion-header').forEach(headerEle => {
+      quoteHeaders.push(headerEle.textContent);
+    });
+    let quoteContent = [];
+    compiled.querySelectorAll('.accordion-body').forEach(quoteEle => {
+      quoteContent.push(quoteEle.textContent.split("\"")[1]);
+    });
+
+
     TEST_QUOTES.forEach(function (quoteItem) {
-      expect(quoteHeaders.contains(quoteItem.author)).toBeTrue();
-      expect(quoteContent.contains(quoteItem.quote)).toBeTrue();
+      expect(quoteHeaders.includes(quoteItem.author)).toBeTrue();
+      expect(quoteContent.includes(quoteItem.quote)).toBeTrue();
     });
   });
 
@@ -150,41 +153,54 @@ describe('QuoteFeedComponent', () => {
       }
   });
 
-  it('should filter quotes by the author keyword in search field', () => {
-    const compiled = fixture.nativeElement;
+  it('should filter quotes by the author keyword in search field', async () => {
+    compiled = fixture.nativeElement;
     compiled.querySelector('#search_enter').value = "multiple";
+    await component.filterQuotes();
     expect(component.quoteArr.length).toEqual(2);
   });
 
-  it('should filter quotes by the quote keyword in search field', () => {
-    const compiled = fixture.nativeElement;
+  it('should filter quotes by the quote keyword in search field', async () => {
+    compiled = fixture.nativeElement;
     compiled.querySelector('#search_enter').value = "second";
+    await component.filterQuotes();
     expect(component.quoteArr.length).toEqual(1);
   });
 
   it('should copy quote to clipboard in correct format on copy click', () => {
-    const compiled = fixture.nativeElement;
-    TEST_QUOTES.forEach(function (quoteItem) {
-      compiled.querySelector(quoteItem.id).click();
-      navigator.clipboard.readText()
-        .then(clipboardContent => {
-          expect(clipboardContent).toEqual(`${quoteItem.quote.replace(/(\r\n|\n|\r)/gm, "").trim()}\n(${quoteItem.author.replace(/(\r\n|\n|\r)/gm, "").trim()})`);
-        });
+    async function readClipboard() {
+      return await navigator.clipboard.readText().then(clipboardContent => { return clipboardContent; });
+    }
+
+    compiled = fixture.nativeElement;
+    TEST_QUOTES.forEach(async function (quoteItem) {
+      spyOn(document, 'execCommand');
+      compiled.querySelector(`#${quoteItem.id}`).click();
+      const clipboardContent = await readClipboard();
+      expect(document.execCommand).toHaveBeenCalledWith('copy');
+      expect(clipboardContent).toEqual(`${quoteItem.quote.replace(/(\r\n|\n|\r)/gm, "").trim()}\n(${quoteItem.author.replace(/(\r\n|\n|\r)/gm, "").trim()})`);
     });
   });
 
-  it('should generate a random quote on page load', () => {
-    const compiled = fixture.nativeElement;
-    expect(component.randomQuote).toBeTruthy();
-    expect(compiled.querySelector('#random_quote_author').value).toBeTruthy();
-    expect(compiled.querySelector('#random_quote_quote').value).toBeTruthy();
+  it('should generate a random quote on page load', async () => {
+    compiled = fixture.nativeElement;
+    await component.generateRandomQuote();
+    expect(Object.keys(component.randomQuote).length).toEqual(2);
+    expect(component.randomQuote['author']).toBeTruthy();
+    expect(component.randomQuote['text']).toBeTruthy();
   });
 
-  it('should save the random quote to user quotes on save click', () => {
-    const compiled = fixture.nativeElement;
-    const quoteLen = component.quoteArr.length;
+  it('should save the random quote to user quotes on save click', async () => {
+    compiled = fixture.nativeElement;
+    const oldQuoteLen = component.quoteArr.length;
+    await component.generateRandomQuote();
     compiled.querySelector('#save_random_quote').click();
+    await component.gatherQuotes();
     const newQuoteLen = component.quoteArr.length;
-    expect(newQuoteLen).toBeGreaterThan(quoteLen);
+    expect(newQuoteLen).toBeGreaterThan(oldQuoteLen);
+  });
+
+  afterEach(async () => {
+    sessionStorage.removeItem('username');
   });
 });

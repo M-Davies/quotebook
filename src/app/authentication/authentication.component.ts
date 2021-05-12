@@ -9,7 +9,6 @@ import { FirebaseService } from '../services/firebase.service';
 export class AuthenticationComponent {
 
   constructor (private fbService: FirebaseService) {
-    sessionStorage.removeItem('displayed_random');
     // If user logged in, redirect to feed
     if (fbService.currentUser) {
       window.location.href = "/feed";

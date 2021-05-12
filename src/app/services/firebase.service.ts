@@ -10,8 +10,9 @@ firebase.initializeApp(config);
   providedIn: 'root'
 })
 export class FirebaseService {
-  currentUser;
+  currentUser: string;
   auth = firebase.auth();
+  ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(this.auth);
 
   constructor () {
     const username = sessionStorage.getItem('username');
@@ -33,8 +34,7 @@ export class FirebaseService {
   }
 
   instantiateUi () {
-    const ui = new firebaseui.auth.AuthUI(this.auth);
-    ui.start('#firebaseui-auth-container', {
+    this.ui.start("#firebaseui_auth_container", {
       callbacks: {
         signInSuccessWithAuthResult: (authResult) => {
           // Save username in storage
