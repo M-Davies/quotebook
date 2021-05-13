@@ -2,3 +2,6 @@ node_modules/
 package-lock.json
 .env
 **/config.ts
+.firebase/hosting.*.cache
+dist/*
+**/*.log
