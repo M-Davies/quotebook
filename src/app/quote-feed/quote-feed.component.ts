@@ -63,7 +63,8 @@ export class QuoteFeedComponent implements AfterViewChecked {
         this.randomQuote = JSON.parse(JSON.stringify(randomQuoteArr[Math.floor(Math.random() * randomQuoteArr.length - 1)]));
       })
       .catch(function (error) {
-        console.error(error);
+        alert("Failed to retrieve a random quote of the day, please try again later");
+        window.location.reload();
       });
   }
 
@@ -225,8 +226,7 @@ export class QuoteFeedComponent implements AfterViewChecked {
       // Get author quotes if there are any & sort
       const quotesRef = this.fbService.getRef(`${this.username}/quotes`);
       quotesRef.get().catch((error) => {
-        console.error(error);
-        alert("Could not get author quotes");
+        alert("Could not get your quotes from database! Please try again later");
         return window.location.reload();
       });
 
@@ -238,7 +238,6 @@ export class QuoteFeedComponent implements AfterViewChecked {
         htmlId: `id${Math.floor(Math.random() * 1000000000).toString()}`
       });
     } catch (err) {
-      console.error(err);
       alert("Failed to upload quote, please try again later");
       return window.location.reload();
     }
